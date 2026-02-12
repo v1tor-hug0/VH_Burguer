@@ -2,7 +2,7 @@
 using VHBurguer.Interfaces;
 using VHBurguer.Domains;
 
-namespace VHBurguer.Interfaces.Repositories
+namespace VHBurguer.Repositories
 {
     public class UsuarioRepository : IUsuarioRepository
     {
