@@ -1,5 +1,5 @@
 ﻿using VHBurguer.Domains;
-using VHBurguer.DTOs;
+using VHBurguer.DTOs.Usuario;
 using VHBurguer.Exceptions;
 using VHBurguer.Interfaces;
 
