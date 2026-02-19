@@ -21,7 +21,7 @@ namespace VHBurguer.Repositories
             return produtos;
         }
 
-        public Produto ObterPorID(int id)
+        public Produto ObterPorId(int id)
         {
             Produto? produto = _context.Produto.Include(produtoDb => produtoDb.Categoria)
                 .Include(produtoDb => produtoDb.Usuario)

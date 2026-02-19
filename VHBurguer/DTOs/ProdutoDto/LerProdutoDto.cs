@@ -2,7 +2,6 @@
 {
     public class LerProdutoDto
     {
-
         public int ProdutoID { get; set; }
 
         public string Nome { get; set; } = null!;
@@ -13,11 +12,12 @@
 
         public bool? StatusProduto { get; set; }
 
-        //categorias
+        // categorias
         public List<int> CategoriaIds { get; set; } = new();
         public List<string> Categorias { get; set; } = new();
 
-        //Usuario que cadastrou o produto
+
+        // usuario que cadastrou
 
         public int? UsuarioID { get; set; }
         public string? UsuarioNome { get; set; }

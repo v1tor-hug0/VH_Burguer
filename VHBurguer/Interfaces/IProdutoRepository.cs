@@ -5,7 +5,7 @@ namespace VHBurguer.Interfaces
     public interface IProdutoRepository
     {
         List<Produto> Listar();
-        Produto ObterPorID(int id);
+        Produto ObterPorId(int id);
         byte[] ObterImagem(int id);
         bool NomeExiste(string nome, int? produtoIdAtual = null);
         void Adicionar(Produto produto, List<int> categoriaIds);

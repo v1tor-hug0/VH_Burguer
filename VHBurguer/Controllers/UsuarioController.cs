@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VHBurguer.Applications.Services;
-using VHBurguer.DTOs.Usuario;
+using VHBurguer.DTOs.UsuarioDto;
 using VHBurguer.Exceptions;
+
 
 namespace VHBurguer.Controllers
 {
@@ -17,79 +18,88 @@ namespace VHBurguer.Controllers
             _service = service;
         }
 
-        [HttpGet] //GET => Lista informaçoes
+        // GET -> lista informações
+        [HttpGet] 
         public ActionResult<List<LerUsuarioDto>> Listar()
         {
-            List<LerUsuarioDto> usuario = _service.Listar();
-            return Ok(usuario);
+            List<LerUsuarioDto> usuarios = _service.Listar();
+
+            // retorna a lista de usuários, a partir da DTO de Services
+            return Ok(usuarios); // OK - 200 - DEU CERTO
         }
 
         [HttpGet("{id}")]
         public ActionResult<LerUsuarioDto> ObterPorId(int id)
         {
             LerUsuarioDto usuario = _service.ObterPorId(id);
+
             if (usuario == null)
             {
-                return NotFound(); // Retorna 404 Not Found se o usuário não for encontrado
+                return NotFound(); // NÃO ENCONTRADO - StatusCode 404
             }
-            return Ok(usuario);
 
+            return Ok(usuario);
         }
 
-        [HttpGet("email/{email}")]
+        [HttpGet("email/{email}")] 
         public ActionResult<LerUsuarioDto> ObterPorEmail(string email)
         {
             LerUsuarioDto usuario = _service.ObterPorEmail(email);
+
             if (usuario == null)
             {
-                return NotFound(); // Retorna 404 Not Found se o usuário não for encontrado
+                return NotFound();
             }
+
             return Ok(usuario);
         }
 
-        [HttpPost]
-        public ActionResult<LerUsuarioDto> Adicionar(CriarUsuarioDto UsuarioDto)
+        // POST - Envia dados 
+        [HttpPost] 
+        public ActionResult<LerUsuarioDto> Adicionar(CriarUsuarioDto usuarioDto)
         {
             try
             {
-                LerUsuarioDto usuarioCriado = _service.Adicionar(UsuarioDto);
-                return StatusCode(201, usuarioCriado); // Retorna 201 Created com o usuário criado
+                LerUsuarioDto usuarioCriado = _service.Adicionar(usuarioDto);
+
+                return StatusCode(201, usuarioCriado);
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message); // Retorna 400 Bad Request com a mensagem de erro
-
+                return BadRequest(ex.Message);
             }
         }
 
+        // Realiza alterações de todos os dados
         [HttpPut("{id}")]
-        public ActionResult<LerUsuarioDto> Atualizar(int id, CriarUsuarioDto UsuarioDto)
+        public ActionResult<LerUsuarioDto> Atualizar(int id, CriarUsuarioDto usuarioDto)
         {
             try
             {
-                LerUsuarioDto usuarioAtualizado = _service.Atualizar(id, UsuarioDto);
-                return Ok(usuarioAtualizado); // Retorna 200 OK com o usuário atualizado
+                LerUsuarioDto usuarioAtualizado = _service.Atualizar(id, usuarioDto);
+
+                return StatusCode(200, usuarioAtualizado);
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message); // Retorna 400 Bad Request com a mensagem de erro
+                return BadRequest(ex.Message);
             }
-
         }
 
-
-        //Remove os dados no banco mas so vai inativar o usuario, ativando a trigger de inativaçao do usuario, para nao perder os dados relacionados a ele, como pedidos e etc
+        // Remove os dados
+        // no nosso banco o delete vai inativar o usuário
+        // por conta da trigger (processo chamado de soft delete)
         [HttpDelete("{id}")]
         public ActionResult Remover(int id)
         {
             try
             {
                 _service.Remover(id);
-                return NoContent(); // Retorna 204 No Content para indicar que a exclusão foi bem-sucedida
+                return NoContent();
             }
             catch (DomainException ex)
             {
-                return BadRequest(ex.Message); // Retorna 400 Bad Request com a mensagem de erro
+                return BadRequest(ex.Message);
             }
         }
     }

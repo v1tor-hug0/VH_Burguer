@@ -1,142 +1,157 @@
-﻿using VHBurguer.Domains;
-using VHBurguer.DTOs.Usuario;
+﻿using System.Security.Cryptography;
+using System.Text;
+using VHBurguer.Domains;
+using VHBurguer.DTOs.UsuarioDto;
 using VHBurguer.Exceptions;
 using VHBurguer.Interfaces;
 
 namespace VHBurguer.Applications.Services
 {
+    // service concentra o "como fazer"
     public class UsuarioService
     {
-        //_repository é o canal para acessar os dados do banco de dados, ou seja, é o canal para acessar os métodos do repository
+        // _repository é o canal para acessar os dados.
         private readonly IUsuarioRepository _repository;
 
-        //Injeção de dependência do repository, ou seja, o repository é injetado no service para que o service possa acessar os métodos do repository
+        // injeção de dependencias
+        // implementamos o repositório e o service só depende da interface
         public UsuarioService(IUsuarioRepository repository)
         {
             _repository = repository;
-
         }
 
-        //Pq private ?
-        //pq o metodo nao e regrea de negocio e nao faz sentido existir fora do service, ou seja, ele é um metodo auxiliar para o service e nao faz sentido existir fora do service
-
-        private static LerUsuarioDto LerDto(Usuario usuario)
+        // Por que private?
+        // pq o método não é regra de negócio e não faz sentido existir fora do UsuarioService
+        private static LerUsuarioDto LerDto(Usuario usuario) // pega a entidade usuario e gera um DTO
         {
             LerUsuarioDto lerUsuario = new LerUsuarioDto
             {
                 UsuarioID = usuario.UsuarioID,
                 Nome = usuario.Nome,
                 Email = usuario.Email,
-                StatusUsuario = usuario.StatusUsuario ?? true
+                StatusUsuario = usuario.StatusUsuario ?? true // se não tiver status no banco, deixa como true
             };
+
             return lerUsuario;
         }
 
         public List<LerUsuarioDto> Listar()
         {
-            List<Usuario> usuario = _repository.Listar();
+            List<Usuario> usuarios = _repository.Listar();
 
-            List<LerUsuarioDto> usuarioDto = usuario.Select(usuarioBanco => LerDto(usuarioBanco)).ToList();  //Select que perorre cada Usuario e LerDto(usuario) //
-                                                                                                             //ToList() para converter em uma lista
-            return usuarioDto;
+            List<LerUsuarioDto> usuariosDto = usuarios
+                .Select(usuarioBanco => LerDto(usuarioBanco)) // SELECT que percorre cada Usuario e LerDto(usuario)
+                .ToList(); // ToList() -> devolve uma lista de DTOs
+
+            return usuariosDto;
         }
 
         private static void ValidarEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
-            {
-                throw new DomainException("Email invalido. ");
+            if (string.IsNullOrWhiteSpace(email) || !email.Contains("@")) {
+                throw new DomainException("Email inválido.");
             }
-
         }
 
         private static byte[] HashSenha(string senha)
         {
-            if (string.IsNullOrWhiteSpace(senha))  //Garante que a senha nao esta vazia
+            if(string.IsNullOrWhiteSpace(senha)) // garante que a senha não está vazia
             {
-                throw new DomainException("A senha é obrigatória.");
+                throw new DomainException("Senha é obrigatória.");
             }
 
-            using (var sha256 = System.Security.Cryptography.SHA256.Create())  // importar o namespace System.Security.Cryptography para usar o SHA256
-            {
-                return sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(senha)); //importar o namespace System.Text 
-            }
+            using var sha256 = SHA256.Create(); // gera um hash SHA256 e devolve em byte[]
+            return sha256.ComputeHash(Encoding.UTF8.GetBytes(senha));
         }
 
         public LerUsuarioDto ObterPorId(int id)
         {
-            Usuario? usuario = _repository.ObterPorID(id);
-            if (usuario == null)
+            Usuario? usuario = _repository.ObterPorId(id);
+
+            if(usuario == null)
             {
-                throw new DomainException("Usuario não encontrado. ");
+                throw new DomainException("Usuário não existe.");
             }
-            return LerDto(usuario); //Se existe usuario, converte para DTO e retorna 
+
+            return LerDto(usuario); // se existe usuário, converte para DTO e devolve o usuário.
         }
 
         public LerUsuarioDto ObterPorEmail(string email)
         {
             Usuario? usuario = _repository.ObterPorEmail(email);
+
             if (usuario == null)
             {
-                throw new DomainException("Usuario não encontrado. ");
+                throw new DomainException("Usuário não existe.");
             }
-            return LerDto(usuario); //Se existe usuario, converte para DTO e retorna 
+
+            return LerDto(usuario); // se existe usuário, converte para DTO e devolve o usuário.
         }
 
         public LerUsuarioDto Adicionar(CriarUsuarioDto usuarioDto)
         {
             ValidarEmail(usuarioDto.Email);
-            if (_repository.EmailExiste(usuarioDto.Email))
+
+            if( _repository.EmailExiste(usuarioDto.Email))
             {
-                throw new DomainException("Email já cadastrado. ");
+                throw new DomainException("Já existe um usuário com este e-mail");
             }
 
-            Usuario usuario = new Usuario
+            Usuario usuario = new Usuario // criando entidade usuario
             {
                 Nome = usuarioDto.Nome,
                 Email = usuarioDto.Email,
-                Senha = HashSenha(usuarioDto.senha),
+                Senha = HashSenha(usuarioDto.Senha),
                 StatusUsuario = true
             };
 
             _repository.Adicionar(usuario);
-            return LerDto(usuario); //retorna LerDto para nao retornar a senha do usuario
+
+            return LerDto(usuario); // retorna LerDto para não retornar o objeto com a senha.
+
         }
+
 
         public LerUsuarioDto Atualizar(int id, CriarUsuarioDto usuarioDto)
         {
+            
+            Usuario usuarioBanco = _repository.ObterPorId(id);
+
+            if(usuarioBanco == null)
+            {
+                throw new DomainException("Usuário não encontrado.");
+            }
+
             ValidarEmail(usuarioDto.Email);
 
-            Usuario usuarioBanco = _repository.ObterPorID(id);
-            if (usuarioBanco == null)
-            {
-                throw new DomainException("Usuario não encontrado. ");
-            }
-
             Usuario usuarioComMesmoEmail = _repository.ObterPorEmail(usuarioDto.Email);
-            if (usuarioComMesmoEmail != null && usuarioComMesmoEmail.UsuarioID != id)
+
+            if(usuarioComMesmoEmail != null && usuarioComMesmoEmail.UsuarioID != id)
             {
-                throw new DomainException("Email já cadastrado. ");
+                throw new DomainException("Já existe um usuário com este e-mail.");
             }
 
+            //Substitui as informações do banco (usuarioBanco)
+            //Inserindo as alterações que estão vindo de usuarioDto.
             usuarioBanco.Nome = usuarioDto.Nome;
             usuarioBanco.Email = usuarioDto.Email;
-            usuarioBanco.Senha = HashSenha(usuarioDto.senha);
+            usuarioBanco.Senha = HashSenha(usuarioDto.Senha);
 
             _repository.Atualizar(usuarioBanco);
-            return LerDto(usuarioBanco);
 
+            return LerDto(usuarioBanco);
         }
 
         public void Remover(int id)
         {
-            Usuario? usuario = _repository.ObterPorID(id);
-            if (usuario == null)
-            {
-                throw new DomainException("Usuario não encontrado. ");
-            }
-            _repository.Remover(id);
+            Usuario usuario = _repository.ObterPorId(id);
 
+            if(usuario == null)
+            {
+                throw new DomainException("Usuário não encontrado.");
+            }
+
+            _repository.Remover(id);
         }
     }
 }

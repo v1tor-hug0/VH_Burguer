@@ -5,8 +5,10 @@ namespace VHBurguer.Interfaces
     public interface IUsuarioRepository
     {
         List<Usuario> Listar();
-        //Pode ser que nao venha nenhum usuario na busca entao colocamos o tipo de retorno como Usuario? para indicar que pode ser nulo
-        Usuario? ObterPorID(int id);
+
+        // pode ser que não venha nenhum usuário na busca, 
+        // então colocamos "?"
+        Usuario? ObterPorId(int id); 
 
         Usuario? ObterPorEmail(string email);
 
@@ -17,5 +19,7 @@ namespace VHBurguer.Interfaces
         void Atualizar(Usuario usuario);
 
         void Remover(int id);
+
+
     }
 }

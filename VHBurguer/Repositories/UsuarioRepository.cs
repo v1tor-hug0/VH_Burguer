@@ -18,7 +18,7 @@ namespace VHBurguer.Repositories
             return _context.Usuario.ToList();
         }
 
-        public Usuario? ObterPorID(int id)
+        public Usuario? ObterPorId(int id)
         {
             return _context.Usuario.Find(id);
         }
