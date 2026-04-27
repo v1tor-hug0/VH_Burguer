@@ -43,7 +43,11 @@ namespace VHBurguer.Repositories
 
         public byte[] ObterImagem(int id)
         {
-            var produto = _context.Produto.Where(p => p.ProdutoID == id).Select(p => p.Imagem).FirstOrDefault();
+            var produto = _context.Produto
+                .Where(produto => produto.ProdutoID == id)
+                .Select(produto => produto.Imagem)
+                .FirstOrDefault();
+
             return produto;
         }
 

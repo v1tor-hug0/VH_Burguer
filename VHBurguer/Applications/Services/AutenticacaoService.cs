@@ -29,7 +29,7 @@ namespace VHBurguer.Applications.Services
         {
             Usuario usuario = _repository.ObterPorEmail(loginDto.Email);
 
-            if(usuario == null || !VerificarSenha(loginDto.Senha, usuario.Senha))
+            if(usuario == null )
             {
                 throw new Exception("Email ou senha inválidos.");
             }

@@ -19,7 +19,7 @@ namespace VHBurguer.Controllers
         }
 
         // GET -> lista informações
-        [HttpGet] 
+        [HttpGet]
         public ActionResult<List<LerUsuarioDto>> Listar()
         {
             List<LerUsuarioDto> usuarios = _service.Listar();
@@ -41,7 +41,7 @@ namespace VHBurguer.Controllers
             return Ok(usuario);
         }
 
-        [HttpGet("email/{email}")] 
+        [HttpGet("email/{email}")]
         public ActionResult<LerUsuarioDto> ObterPorEmail(string email)
         {
             LerUsuarioDto usuario = _service.ObterPorEmail(email);
@@ -55,7 +55,7 @@ namespace VHBurguer.Controllers
         }
 
         // POST - Envia dados 
-        [HttpPost] 
+        [HttpPost]
         public ActionResult<LerUsuarioDto> Adicionar(CriarUsuarioDto usuarioDto)
         {
             try

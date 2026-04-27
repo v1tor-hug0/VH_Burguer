@@ -48,14 +48,15 @@ namespace VHBurguer.Applications.Services
 
         private static void ValidarEmail(string email)
         {
-            if (string.IsNullOrWhiteSpace(email) || !email.Contains("@")) {
+            if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
+            {
                 throw new DomainException("Email inválido.");
             }
         }
 
         private static byte[] HashSenha(string senha)
         {
-            if(string.IsNullOrWhiteSpace(senha)) // garante que a senha não está vazia
+            if (string.IsNullOrWhiteSpace(senha)) // garante que a senha não está vazia
             {
                 throw new DomainException("Senha é obrigatória.");
             }
@@ -68,7 +69,7 @@ namespace VHBurguer.Applications.Services
         {
             Usuario? usuario = _repository.ObterPorId(id);
 
-            if(usuario == null)
+            if (usuario == null)
             {
                 throw new DomainException("Usuário não existe.");
             }
@@ -92,7 +93,7 @@ namespace VHBurguer.Applications.Services
         {
             ValidarEmail(usuarioDto.Email);
 
-            if( _repository.EmailExiste(usuarioDto.Email))
+            if (_repository.EmailExiste(usuarioDto.Email))
             {
                 throw new DomainException("Já existe um usuário com este e-mail");
             }
@@ -114,10 +115,10 @@ namespace VHBurguer.Applications.Services
 
         public LerUsuarioDto Atualizar(int id, CriarUsuarioDto usuarioDto)
         {
-            
+
             Usuario usuarioBanco = _repository.ObterPorId(id);
 
-            if(usuarioBanco == null)
+            if (usuarioBanco == null)
             {
                 throw new DomainException("Usuário não encontrado.");
             }
@@ -126,7 +127,7 @@ namespace VHBurguer.Applications.Services
 
             Usuario usuarioComMesmoEmail = _repository.ObterPorEmail(usuarioDto.Email);
 
-            if(usuarioComMesmoEmail != null && usuarioComMesmoEmail.UsuarioID != id)
+            if (usuarioComMesmoEmail != null && usuarioComMesmoEmail.UsuarioID != id)
             {
                 throw new DomainException("Já existe um usuário com este e-mail.");
             }
@@ -146,7 +147,7 @@ namespace VHBurguer.Applications.Services
         {
             Usuario usuario = _repository.ObterPorId(id);
 
-            if(usuario == null)
+            if (usuario == null)
             {
                 throw new DomainException("Usuário não encontrado.");
             }

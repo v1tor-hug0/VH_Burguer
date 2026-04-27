@@ -30,7 +30,7 @@ namespace VHBurguer.Applications.Autenticacao
             var audience = _config["Jwt:Audience"]!;
 
             // tempo de expiração do token em minutos define por quanto tempo o token é válido a API valida se o token ainda é válido ou se já expirou
-            var expiraEmMinutos = int.Parse(_config["Jwt:ExpireInMinutes"]!);
+            var expiraEmMinutos = int.Parse(_config["Jwt:ExpiraEmMinutos"]!);
 
             //Converte a chave para bytes 
             var keyBytes = Encoding.UTF8.GetBytes(chave);
