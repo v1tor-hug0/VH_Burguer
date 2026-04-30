@@ -8,7 +8,7 @@ namespace VHBurguer.Interfaces
 
         // pode ser que não venha nenhum usuário na busca, 
         // então colocamos "?"
-        Usuario? ObterPorId(int id); 
+        Usuario? ObterPorId(int id);
 
         Usuario? ObterPorEmail(string email);
 

@@ -20,17 +20,20 @@ namespace VHBurguer.Controllers
         }
 
         // autenticação do usuário
-        private int ObterUsuarioLogado()
+        private int ObterUsuarioIdLogado()
         {
-            //Busca no token/claims o valor armazenado como id do usuario
-            //ClaimTypes.NameIdentifier geralmeente guarda o id do usuario no JWT
+            // busca no token/claims o valor armazenado como id do usuário
+            // ClaimTypes.NameIdentifier geralmente guarda o ID do usuário no JWT
             string? idTexto = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (string.IsNullOrEmpty(idTexto))
+            if (string.IsNullOrWhiteSpace(idTexto))
             {
-                throw new Exception("Usuário não autenticado.");
+                throw new DomainException("Usuário não autenticado");
             }
 
+            // Converte o ID que veio como texto para inteiro
+            // nosso UsuarioID no sistema está como int
+            // as Claims (informações do usuário dentro do token) sempre são armazenadas como texto.
             return int.Parse(idTexto);
         }
 
@@ -57,37 +60,42 @@ namespace VHBurguer.Controllers
             return Ok(produto);
         }
 
-        //GET -> api/produto/usuario
+        // GET -> api/produto/5/imagem
         [HttpGet("{id}/imagem")]
         public ActionResult ObterImagem(int id)
         {
             try
             {
                 var imagem = _service.ObterImagem(id);
+
+                // Retorna o arquivo para o navegador
+                // "image/jpeg" informa o tipo da imagem (MIME type)
+                // O navegador entende que deve renderizar como imagem
                 return File(imagem, "image/jpeg");
             }
             catch (DomainException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.Message); // NotFound -> não encontrado
             }
         }
 
         [HttpPost]
-        //Indica que recebe dados no formato multpart/form-data, necessário para upload de arquivos
+        // indica que recebe dados no formato multipart/form-data
+        // necessário quando enviamos arquivos (ex. imagem do produto)
         [Consumes("multipart/form-data")]
-        [Authorize] //Exige login para alterar os produtos
+        //[Authorize] // exige login para adicionar produtos
 
-        // [FromForm] -> diz que os dados vem do formulario da requisição ("multipart/form-data")
+        // [FromForm] -> diz que os dados vem do formulário da requisição (multipart/form-data)
         public ActionResult Adicionar([FromForm] CriarProdutoDto produtoDto)
         {
             try
             {
-                int usuarioId = ObterUsuarioLogado();
+                int usuarioId = ObterUsuarioIdLogado();
 
-                // o cadastro fica associado ao usuário logado, para controle de acesso e auditoria
+                // o cadastro fica associado ao usuário logado
                 _service.Adicionar(produtoDto, usuarioId);
-                return StatusCode(201);
 
+                return StatusCode(201); // Created
             }
             catch (DomainException ex)
             {
@@ -97,8 +105,7 @@ namespace VHBurguer.Controllers
 
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
-        [Authorize] //Exige login para alterar os produtos
-
+        [Authorize]
         public ActionResult Atualizar(int id, [FromForm] AtualizarProdutoDto produtoDto)
         {
             try
@@ -113,7 +120,7 @@ namespace VHBurguer.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize] //Exige login para alterar os produtos
+        [Authorize]
         public ActionResult Remover(int id)
         {
             try
@@ -124,7 +131,6 @@ namespace VHBurguer.Controllers
             catch (DomainException ex)
             {
                 return BadRequest(ex.Message);
-
             }
         }
     }
