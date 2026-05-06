@@ -29,13 +29,14 @@ public partial class VH_BurguerContext : DbContext
     public virtual DbSet<Usuario> Usuario { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=VH_Burguer;Trusted_Connection=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Categoria>(entity =>
         {
-            entity.HasKey(e => e.CategoriaID).HasName("PK__Categori__F353C1C53483ACD6");
+            entity.HasKey(e => e.CategoriaID).HasName("PK__Categori__F353C1C5A629C2C7");
 
             entity.Property(e => e.Nome)
                 .HasMaxLength(50)
@@ -44,7 +45,7 @@ public partial class VH_BurguerContext : DbContext
 
         modelBuilder.Entity<Log_AlteracaoProduto>(entity =>
         {
-            entity.HasKey(e => e.Log_AlteracaoProdutoID).HasName("PK__Log_Alte__D06C51B700D9DCAE");
+            entity.HasKey(e => e.Log_AlteracaoProdutoID).HasName("PK__Log_Alte__D06C51B7C35E45C8");
 
             entity.Property(e => e.DataAlteracao).HasPrecision(0);
             entity.Property(e => e.NomeAnterior)
@@ -54,14 +55,20 @@ public partial class VH_BurguerContext : DbContext
 
             entity.HasOne(d => d.Produto).WithMany(p => p.Log_AlteracaoProduto)
                 .HasForeignKey(d => d.ProdutoID)
-                .HasConstraintName("FK__Log_Alter__Produ__71D1E811");
+                .HasConstraintName("FK__Log_Alter__Produ__5FB337D6");
         });
 
         modelBuilder.Entity<Produto>(entity =>
         {
-            entity.HasKey(e => e.ProdutoID).HasName("PK__Produto__9C8800C33C0491D6");
+            entity.HasKey(e => e.ProdutoID).HasName("PK__Produto__9C8800C3BD7468E5");
 
-            entity.HasIndex(e => e.Nome, "UQ__Produto__7D8FE3B252023A83").IsUnique();
+            entity.ToTable(tb =>
+                {
+                    tb.HasTrigger("trg_AlteracaoProduto");
+                    tb.HasTrigger("trg_ExclusaoProduto");
+                });
+
+            entity.HasIndex(e => e.Nome, "UQ__Produto__7D8FE3B2CDB95B8A").IsUnique();
 
             entity.Property(e => e.Nome)
                 .HasMaxLength(100)
@@ -71,7 +78,7 @@ public partial class VH_BurguerContext : DbContext
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Produto)
                 .HasForeignKey(d => d.UsuarioID)
-                .HasConstraintName("FK__Produto__Usuario__628FA481");
+                .HasConstraintName("FK__Produto__Usuario__5070F446");
 
             entity.HasMany(d => d.Categoria).WithMany(p => p.Produto)
                 .UsingEntity<Dictionary<string, object>>(
@@ -105,7 +112,7 @@ public partial class VH_BurguerContext : DbContext
 
         modelBuilder.Entity<Promocao>(entity =>
         {
-            entity.HasKey(e => e.PromocaoID).HasName("PK__Promocao__254B583DEC347FAA");
+            entity.HasKey(e => e.PromocaoID).HasName("PK__Promocao__254B583D77B3BD4D");
 
             entity.Property(e => e.DataExpiracao).HasPrecision(0);
             entity.Property(e => e.Nome)
@@ -116,9 +123,11 @@ public partial class VH_BurguerContext : DbContext
 
         modelBuilder.Entity<Usuario>(entity =>
         {
-            entity.HasKey(e => e.UsuarioID).HasName("PK__Usuario__2B3DE7983A5CC959");
+            entity.HasKey(e => e.UsuarioID).HasName("PK__Usuario__2B3DE7986CAEC199");
 
-            entity.HasIndex(e => e.Email, "UQ__Usuario__A9D10534C9DDB5D0").IsUnique();
+            entity.ToTable(tb => tb.HasTrigger("trg_ExclusaoUsuario"));
+
+            entity.HasIndex(e => e.Email, "UQ__Usuario__A9D1053451B087E4").IsUnique();
 
             entity.Property(e => e.Email)
                 .HasMaxLength(150)
