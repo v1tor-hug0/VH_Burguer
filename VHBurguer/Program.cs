@@ -11,7 +11,7 @@ using VHBurguer.Contexts;
 using VHBurguer.Interfaces;
 using VHBurguer.Repositories;
 
-
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
