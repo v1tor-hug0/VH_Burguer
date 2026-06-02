@@ -66,7 +66,7 @@ namespace VHBurguer.Controllers
             catch (DomainException ex)
             {
                 return BadRequest(ex.Message);
-                //return StatusCode(400, ex.Message);
+                
             }
         }
 

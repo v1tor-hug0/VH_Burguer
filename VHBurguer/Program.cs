@@ -1,13 +1,17 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using VHBurguer.Applications.Autenticacao;
+using VHBurguer.Applications.ContentSafety;
 using VHBurguer.Applications.Services;
 using VHBurguer.Contexts;
 using VHBurguer.Interfaces;
 using VHBurguer.Repositories;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +74,7 @@ builder.Services.AddScoped<LogAlteracaoProdutoService>();
 builder.Services.AddScoped<GeradorTokenJwt>();
 builder.Services.AddScoped<AutenticacaoService>();
 
+builder.Services.AddScoped<IContentSafetyRepository, ContentSafetyService>();
 
 // Configura o sistema de autenticacao da aplicacao.
 // Aqui estamos dizendo que o tipo de autenticacao padrao sera JWT Bearer.
