@@ -4,3 +4,12 @@
 
 /VHBurguer/VHBurguer.csproj
 /VHBurguer/.env
+.env
+.env.local
+.env*.local   
+**/.json/
+**/.vs/
+**/.bin/
+**/.obj/
+**/.vs/
+
